@@ -1,0 +1,21 @@
+Channel details:
+    1. Adrian Twarog - UCvM5YYWwfLwpcQgbRr68JLQ
+    2. Tech With Tim - UC4JX40jDee_tINbkjycV4Sg
+    3. Ashish Pratap Singh - UCUicT5osQLEL11TimsC8I1g
+    4. Subject 360 - UCnoHf1c8DoRBaozGwLEJqow
+    5. AlgoMasterIO - UCNH6kHUZ0cb2ZDg7mo2uVuA
+
+Db queries:
+use rsk_youtube_db;
+create table Channels (channel_id varchar(50) not null primary key, channel_name varchar(255) not null, channel_type varchar(255), channel_description text, channel_status varchar(255) , channel_subscriber_count int, video_count int, view_count int);
+create table Playlists ( playlist_id varchar(255) primary key, channel_id varchar(255), playlist_name varchar(255), foreign key (channel_id) references Channels(channel_id));
+create table Videos (video_id varchar(255) primary key, playlist_id varchar(255), video_name varchar(255), video_description text, published_date datetime, view_count int, like_count int, dislike_count int, favorite_count int, comment_count int, duration int, thumbnails_url varchar(255), caption_status varchar(255), foreign key (playlist_id) references Playlists(playlist_id));
+create table Comments ( comment_id varchar(255) primary key, video_id varchar(255), comment_text text, comment_author varchar(255), comment_published_date datetime, foreign key (video_id) references Videos(video_id));
+
+
+INSERT INTO Channels (channel_id, channel_name, channel_description, view_count, subscriber_count, video_count) VALUES ('UCvM5YYWwfLwpcQgbRr68JLQ', 'RSK Adrian Twarog', "I'm Adrian from Australia, a designer and developer who makes websites and apps using platforms like React Native. I'm hoping to share some of the things I've learnt over the years about my career and hobbies for coding, user interface and experience!\n\nSome of the things we will cover will include:\n- Development for React, React Native, Javascript, HTML, CSS, etc\n- Small changes to improve UI & UX, like the use of colour, positioning and size\n- Large changes like websites or apps, like entire re-designs\n- Techniques on creating style-guides\n- Reviews of existing businesses online presence and tips on improving them\n\n#coding #programming #ui #ux #webdevelopment #development #react #reactnative #design #userexperience #userinterface", '36028250', '406000', '115') ON DUPLICATE KEY UPDATE channel_name=VALUES(channel_name), channel_description=VALUES(channel_description), view_count=VALUES(view_count), subscriber_count=VALUES(subscriber_count), video_count=VALUES(video_count)
+
+
+Q1 : select C.channel_name, V.video_name from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY C.channel_name, V.video_name;
+Q2 : select C.channel_name, COUNT(V.video_id) AS video_count from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY video_count DESC LIMIT 1;
+Q3 : select C.channel_name, V.video_id, V.view_count from Channels C join Playlists P ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY V.view_count DESC LIMIT 10; 
