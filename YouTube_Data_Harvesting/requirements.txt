@@ -19,3 +19,4 @@ INSERT INTO Channels (channel_id, channel_name, channel_description, view_count,
 Q1 : select C.channel_name, V.video_name from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY C.channel_name, V.video_name;
 Q2 : select C.channel_name, COUNT(V.video_id) AS video_count from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY video_count DESC LIMIT 1;
 Q3 : select C.channel_name, V.video_id, V.view_count from Channels C join Playlists P ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY V.view_count DESC LIMIT 10; 
+Q4 : SELECT V.video_id, COUNT(cmt.comment_id) AS comment_count FROM Videos V LEFT JOIN comments cmt ON V.video_id = cmt.video_id GROUP BY V.video_id ORDER BY comment_count DESC;
