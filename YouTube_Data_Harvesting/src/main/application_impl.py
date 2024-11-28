@@ -102,7 +102,16 @@ class ApplicationImpl(ConfigurationData):
         pre_defined_queries = {
             "option_1": "select C.channel_name, V.video_name from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY C.channel_name, V.video_name;",
             "option_2": "select C.channel_name, COUNT(V.video_id) AS video_count from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY video_count DESC LIMIT 1;",
-            "option_3": "select C.channel_name, V.video_id, V.view_count from Channels C join Playlists P ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY V.view_count DESC LIMIT 10;"
+            "option_3": "select C.channel_name, V.video_id, V.view_count from Channels C join Playlists P ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY V.view_count DESC LIMIT 10;",
+            "option_4": "SELECT V.video_id, COUNT(cmt.comment_id) AS comment_count FROM Videos V LEFT JOIN comments cmt ON V.video_id = cmt.video_id GROUP BY V.video_id ORDER BY comment_count DESC;",
+            "option_5": "SELECT C.channel_name, V.video_name, V.like_count FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos V ON P.playlist_id = V.playlist_id ORDER BY V.like_count DESC LIMIT 10;",
+            "option_6": "SELECT V.video_id, V.video_name, V.like_count, V.dislike_count, (V.like_count + V.dislike_count) AS total_reactions FROM Videos V ORDER BY total_reactions DESC;",
+            "option_7": "SELECT C.channel_name, SUM(V.view_count) AS total_views FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY total_views DESC;",
+            "option_8": "SELECT DISTINCT C.channel_name FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos v ON p.playlist_id = V.playlist_id WHERE YEAR(V.published_date) = 2022;",
+            "option_9": "SELECT c.channel_name, AVG(CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'H', 1), 'PT', -1) AS UNSIGNED) * 3600 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'M', 1), 'H', -1) AS UNSIGNED) * 60 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'S', 1), 'M', -1) AS UNSIGNED)) AS average_duration FROM channels c JOIN playlists p ON c.channel_id = p.channel_id JOIN videos v ON p.playlist_id = v.playlist_id GROUP BY c.channel_name ORDER BY average_duration DESC;",
+            "option_10": "SELECT ch.channel_name, vi.video_name, COUNT(cm.comment_id) AS comment_count FROM channels ch JOIN playlists pl ON ch.channel_id = pl.channel_id JOIN videos vi ON pl.playlist_id = vi.playlist_id LEFT JOIN comments cm ON vi.video_id = cm.video_id GROUP BY vi.video_id, ch.channel_name, vi.video_name HAVING COUNT(cm.comment_id) = (SELECT MAX(comment_count) FROM (SELECT COUNT(comment_id) AS comment_count FROM videos v LEFT JOIN comments c ON v.video_id = c.video_id GROUP BY v.video_id) t);"
+
+
             }
         
         db = MySqlDBUtil(self.db_host, self.db_user, self.db_password, self.db_name)
