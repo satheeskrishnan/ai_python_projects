@@ -1,37 +1,7 @@
 
-install:
 pip install --upgrade google-api-python-client
 pip install --upgrade mysql-connector-python
 pip install mysql.connector
 pip install streamlit
 pip install isodate
 pip install pandas 
-
-Channel details:
-    1. Adrian Twarog - UCvM5YYWwfLwpcQgbRr68JLQ
-    2. Tech With Tim - UC4JX40jDee_tINbkjycV4Sg
-    3. Ashish Pratap Singh - UCUicT5osQLEL11TimsC8I1g
-    4. Subject 360 - UCnoHf1c8DoRBaozGwLEJqow
-    5. AlgoMasterIO - UCNH6kHUZ0cb2ZDg7mo2uVuA
-
-Db queries:
-use rsk_youtube_db;
-create table Channels (channel_id varchar(50) not null primary key, channel_name varchar(255) not null, channel_type varchar(255), channel_description text, channel_status varchar(255) , channel_subscriber_count int, video_count int, view_count int);
-create table Playlists ( playlist_id varchar(255) primary key, channel_id varchar(255), playlist_name varchar(255), foreign key (channel_id) references Channels(channel_id));
-create table Videos (video_id varchar(255) primary key, playlist_id varchar(255), video_name varchar(255), video_description text, published_date datetime, view_count int, like_count int, dislike_count int, favorite_count int, comment_count int, duration int, thumbnails_url varchar(255), caption_status varchar(255), foreign key (playlist_id) references Playlists(playlist_id));
-create table Comments ( comment_id varchar(255) primary key, video_id varchar(255), comment_text text, comment_author varchar(255), comment_published_date datetime, foreign key (video_id) references Videos(video_id));
-
-
-INSERT INTO Channels (channel_id, channel_name, channel_description, view_count, subscriber_count, video_count) VALUES ('UCvM5YYWwfLwpcQgbRr68JLQ', 'RSK Adrian Twarog', "I'm Adrian from Australia, a designer and developer who makes websites and apps using platforms like React Native. I'm hoping to share some of the things I've learnt over the years about my career and hobbies for coding, user interface and experience!\n\nSome of the things we will cover will include:\n- Development for React, React Native, Javascript, HTML, CSS, etc\n- Small changes to improve UI & UX, like the use of colour, positioning and size\n- Large changes like websites or apps, like entire re-designs\n- Techniques on creating style-guides\n- Reviews of existing businesses online presence and tips on improving them\n\n#coding #programming #ui #ux #webdevelopment #development #react #reactnative #design #userexperience #userinterface", '36028250', '406000', '115') ON DUPLICATE KEY UPDATE channel_name=VALUES(channel_name), channel_description=VALUES(channel_description), view_count=VALUES(view_count), subscriber_count=VALUES(subscriber_count), video_count=VALUES(video_count)
-
-
-Q1 : select C.channel_name, V.video_name from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY C.channel_name, V.video_name;
-Q2 : select C.channel_name, COUNT(V.video_id) AS video_count from Channels C join Playlists P  ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY video_count DESC LIMIT 1;
-Q3 : select C.channel_name, V.video_id, V.view_count from Channels C join Playlists P ON C.channel_id = P.channel_id join Videos V ON P.playlist_id = V.playlist_id ORDER BY V.view_count DESC LIMIT 10; 
-Q4 : SELECT V.video_id, COUNT(cmt.comment_id) AS comment_count FROM Videos V LEFT JOIN comments cmt ON V.video_id = cmt.video_id GROUP BY V.video_id ORDER BY comment_count DESC;
-Q5 : SELECT C.channel_name, V.video_name, V.like_count FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos V ON P.playlist_id = V.playlist_id ORDER BY V.like_count DESC LIMIT 10;
-Q6 : SELECT V.video_id, V.video_name, V.like_count, V.dislike_count, (V.like_count + V.dislike_count) AS total_reactions FROM Videos V ORDER BY total_reactions DESC;
-Q7 : SELECT C.channel_name, SUM(V.view_count) AS total_views FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos V ON P.playlist_id = V.playlist_id GROUP BY C.channel_name ORDER BY total_views DESC;
-Q8 : SELECT DISTINCT C.channel_name FROM Channels C JOIN Playlists P ON C.channel_id = P.channel_id JOIN Videos v ON p.playlist_id = V.playlist_id WHERE YEAR(V.published_date) = 2022;
-Q9 : SELECT c.channel_name, AVG(CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'H', 1), 'PT', -1) AS UNSIGNED) * 3600 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'M', 1), 'H', -1) AS UNSIGNED) * 60 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(v.duration, 'S', 1), 'M', -1) AS UNSIGNED)) AS average_duration FROM channels c JOIN playlists p ON c.channel_id = p.channel_id JOIN videos v ON p.playlist_id = v.playlist_id GROUP BY c.channel_name ORDER BY average_duration DESC;
-Q10: SELECT ch.channel_name, vi.video_name, COUNT(cm.comment_id) AS comment_count FROM channels ch JOIN playlists pl ON ch.channel_id = pl.channel_id JOIN videos vi ON pl.playlist_id = vi.playlist_id LEFT JOIN comments cm ON vi.video_id = cm.video_id GROUP BY vi.video_id, ch.channel_name, vi.video_name HAVING COUNT(cm.comment_id) = (SELECT MAX(comment_count) FROM (SELECT COUNT(comment_id) AS comment_count FROM videos v LEFT JOIN comments c ON v.video_id = c.video_id GROUP BY v.video_id) t); 
