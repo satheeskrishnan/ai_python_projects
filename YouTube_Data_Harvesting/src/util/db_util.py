@@ -41,7 +41,6 @@ class MySqlDBUtil:
             placeholders = ', '.join(['%s'] * len(columns))
             bulk_records = [tuple(row) for row in df.to_numpy()]
             
-            
             query = f"""INSERT INTO {table_name} ({columns_names}) VALUES ({placeholders}) ON DUPLICATE KEY UPDATE {update_columns};"""
 
             # Execute the query
